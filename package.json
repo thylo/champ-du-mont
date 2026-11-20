@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "db:up": "docker compose up -d couchdb couchdb-init",
+    "db:up": "docker compose up -d --build couchdb couchdb-init",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f couchdb couchdb-init",
     "prod:up": "docker compose up -d --build",

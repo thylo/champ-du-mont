@@ -5,14 +5,15 @@ name: champ-du-mont
 
 services:
   couchdb:
-    image: couchdb:3.4
+    build:
+      context: docker/couchdb
+      target: couchdb
     restart: unless-stopped
     environment:
       COUCHDB_USER: ${COUCHDB_USER:?COUCHDB_USER manquant dans .env}
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?COUCHDB_PASSWORD manquant dans .env}
     volumes:
       - couchdb-data:/opt/couchdb/data
-      - ./docker/couchdb/10-app.ini:/opt/couchdb/etc/local.d/10-app.ini
     ports:
       # Uniquement sur localhost : de l'extérieur, CouchDB est joint via nginx (/db)
       - "127.0.0.1:5984:5984"
@@ -24,7 +25,9 @@ services:
 
   # Bases, droits, règles et utilisateurs. Idempotent, s'arrête une fois fini.
   couchdb-init:
-    image: curlimages/curl:8.11.1
+    build:
+      context: docker/couchdb
+      target: init
     depends_on:
       couchdb:
         condition: service_healthy
@@ -33,10 +36,6 @@ services:
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
       BENEVOLE_PASSWORD: ${BENEVOLE_PASSWORD:?BENEVOLE_PASSWORD manquant dans .env}
       GESTION_PASSWORD: ${GESTION_PASSWORD:?GESTION_PASSWORD manquant dans .env}
-    volumes:
-      - ./docker/couchdb/init.sh:/init.sh:ro
-      - ./docker/couchdb/regles:/regles:ro
-    entrypoint: ["sh", "/init.sh"]
     restart: "no"
 
   web:
