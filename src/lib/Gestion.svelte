@@ -19,14 +19,30 @@
     }
   }
 
+  // Le mot de passe est mémorisé sur cet appareil jusqu'à « Se déconnecter »
+  const CLE = 'motDePasseGestion'
+
+  async function ouvrir(motDePasse) {
+    await verifier('gestion', motDePasse)
+    bases = { catalogue: distante('catalogue', 'gestion', motDePasse), ventes: distante('ventes', 'gestion', motDePasse) }
+    articles = await articlesDe(bases.catalogue)
+    localStorage.setItem(CLE, motDePasse)
+  }
+
   const connecter = (e) =>
-    essayer(async () => {
+    essayer(() => {
       e.preventDefault()
-      const motDePasse = new FormData(e.currentTarget).get('motDePasse')
-      await verifier('gestion', motDePasse)
-      bases = { catalogue: distante('catalogue', 'gestion', motDePasse), ventes: distante('ventes', 'gestion', motDePasse) }
-      articles = await articlesDe(bases.catalogue)
+      return ouvrir(new FormData(e.currentTarget).get('motDePasse'))
     })
+
+  function deconnecter() {
+    localStorage.removeItem(CLE)
+    bases = null
+    articles = []
+  }
+
+  const memorise = localStorage.getItem(CLE)
+  if (memorise) essayer(() => ouvrir(memorise))
 
   const modifier = (article) => (fiche = { ...article, prix: (article.prix / 100).toFixed(2).replace('.', ',') })
 
@@ -41,6 +57,14 @@
         prix,
         maj: new Date().toISOString(),
       })
+      fiche = vide()
+      articles = await articlesDe(bases.catalogue)
+    })
+
+  // Sans risque pour les ventes passées : chaque vente garde une copie du libellé et du prix
+  const supprimer = () =>
+    essayer(async () => {
+      await bases.catalogue.remove(fiche._id, fiche._rev)
       fiche = vide()
       articles = await articlesDe(bases.catalogue)
     })
@@ -70,6 +94,7 @@
     <button>Se connecter</button>
   </form>
 {:else}
+  <p><button onclick={deconnecter}>Se déconnecter</button></p>
   <h2>Articles</h2>
   <div class="u-defile">
     <table>
@@ -103,6 +128,13 @@
       <button class="c-principal">Enregistrer</button>
       {#if fiche._id}<button type="button" onclick={() => (fiche = vide())}>Annuler</button>{/if}
     </p>
+    {#if fiche._id}
+      <details>
+        <summary>Supprimer cet article</summary>
+        <p>L'article disparaît de toutes les caisses. Les ventes déjà faites ne changent pas.</p>
+        <button type="button" class="c-danger" onclick={supprimer}>Confirmer la suppression</button>
+      </details>
+    {/if}
   </form>
 
   <h2>Ventes</h2>

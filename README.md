@@ -32,11 +32,11 @@ Fauxton : http://localhost:5984/_utils
 ## Déploiement (Coolify)
 
 1. Nouvelle ressource « Docker Compose » depuis ce dépôt git, fichier `compose.yaml`.
-2. Variables : toutes celles de `.env.example`, avec des mots de passe forts et `COUCHDB_SECRET` = `openssl rand -hex 32`.
+2. Variables : les 6 de `.env.example`, avec des mots de passe forts.
 3. Domaine HTTPS sur le service `web` (port 80). CouchDB reste interne et Fauxton est bloqué sur `/db/_utils`.
 4. `couchdb-init` s'arrête une fois l'initialisation terminée : c'est normal.
 
-Sans Coolify : `npm run prod:up` (app sur `127.0.0.1:APP_PORT`, mettre un reverse proxy HTTPS devant).
+Sans Coolify : `npm run prod:up` (app sur `127.0.0.1:8080`, mettre un reverse proxy HTTPS devant).
 
 **Ne jamais déployer pendant le marché.** Le service worker sert la version en cache et télécharge la nouvelle (page + fichiers) pour le lancement suivant.
 

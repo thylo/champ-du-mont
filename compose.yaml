@@ -10,13 +10,12 @@ services:
     environment:
       COUCHDB_USER: ${COUCHDB_USER:?COUCHDB_USER manquant dans .env}
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?COUCHDB_PASSWORD manquant dans .env}
-      COUCHDB_SECRET: ${COUCHDB_SECRET:?COUCHDB_SECRET manquant dans .env}
     volumes:
       - couchdb-data:/opt/couchdb/data
       - ./docker/couchdb/10-app.ini:/opt/couchdb/etc/local.d/10-app.ini
     ports:
       # Uniquement sur localhost : de l'extérieur, CouchDB est joint via nginx (/db)
-      - "127.0.0.1:${COUCHDB_PORT:-5984}:5984"
+      - "127.0.0.1:5984:5984"
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:5984/_up || exit 1"]
       interval: 5s
@@ -30,7 +29,6 @@ services:
       couchdb:
         condition: service_healthy
     environment:
-      COUCHDB_URL: http://couchdb:5984
       COUCHDB_USER: ${COUCHDB_USER}
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
       BENEVOLE_PASSWORD: ${BENEVOLE_PASSWORD:?BENEVOLE_PASSWORD manquant dans .env}
@@ -47,6 +45,7 @@ services:
       args:
         VITE_BENEFICIAIRE: ${VITE_BENEFICIAIRE:?VITE_BENEFICIAIRE manquant dans .env}
         VITE_IBAN: ${VITE_IBAN:?VITE_IBAN manquant dans .env}
+        # Optionnel : « libre » si une app bancaire ne reprend pas la communication structurée
         VITE_CHAMP_REF: ${VITE_CHAMP_REF:-structure}
     restart: unless-stopped
     depends_on:
@@ -54,7 +53,7 @@ services:
         condition: service_healthy
     ports:
       # Uniquement sur localhost : le HTTPS est assuré par Coolify ou un reverse proxy devant
-      - "127.0.0.1:${APP_PORT:-8080}:80"
+      - "127.0.0.1:8080:80"
 
 volumes:
   couchdb-data:
