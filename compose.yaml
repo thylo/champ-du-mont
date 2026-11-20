@@ -1,5 +1,6 @@
 # Local :  npm run db:up   → CouchDB seul (l'app tourne avec `npm run dev`)
 # Prod :   docker compose up -d --build   (même fichier sur Coolify : domaine sur le service web, port 80)
+# Aucun port publié ici : Coolify joint `web` par son proxy. Les ports locaux sont dans compose.override.yaml.
 
 name: champ-du-mont
 
@@ -14,9 +15,6 @@ services:
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?COUCHDB_PASSWORD manquant dans .env}
     volumes:
       - couchdb-data:/opt/couchdb/data
-    ports:
-      # Uniquement sur localhost : de l'extérieur, CouchDB est joint via nginx (/db)
-      - "127.0.0.1:5984:5984"
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:5984/_up || exit 1"]
       interval: 5s
@@ -50,9 +48,6 @@ services:
     depends_on:
       couchdb:
         condition: service_healthy
-    ports:
-      # Uniquement sur localhost : le HTTPS est assuré par Coolify ou un reverse proxy devant
-      - "127.0.0.1:8080:80"
 
 volumes:
   couchdb-data:

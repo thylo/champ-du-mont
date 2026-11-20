@@ -36,7 +36,7 @@ Fauxton : http://localhost:5984/_utils
 3. Domaine HTTPS sur le service `web` (port 80). CouchDB reste interne et Fauxton est bloqué sur `/db/_utils`.
 4. `couchdb-init` s'arrête une fois l'initialisation terminée : c'est normal.
 
-Sans Coolify : `npm run prod:up` (app sur `127.0.0.1:8080`, mettre un reverse proxy HTTPS devant).
+Sans Coolify : `npm run prod:up` (app sur `127.0.0.1:8080` via `compose.override.yaml`, mettre un reverse proxy HTTPS devant).
 
 **Ne jamais déployer pendant le marché.** Le service worker sert la version en cache et télécharge la nouvelle (page + fichiers) pour le lancement suivant.
 

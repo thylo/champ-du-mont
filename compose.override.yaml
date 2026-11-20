@@ -1,0 +1,10 @@
+# Chargé automatiquement par `docker compose` en local, ignoré par Coolify (qui passe -f compose.yaml).
+services:
+  couchdb:
+    ports:
+      # Uniquement sur localhost : pour `npm run dev` et Fauxton
+      - "127.0.0.1:5984:5984"
+  web:
+    ports:
+      # Uniquement sur localhost : mettre un reverse proxy HTTPS devant
+      - "127.0.0.1:8080:80"
